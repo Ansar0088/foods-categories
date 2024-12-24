@@ -77,7 +77,6 @@ export default function OrderForm() {
             onCheckedChange={handleCheckboxChange}
             checked={!isVisible}
             className="checkbox"
-
           />
           <Label htmlFor="walking">Walking</Label>
         </div>
@@ -100,55 +99,54 @@ export default function OrderForm() {
             </div>
             <Input placeholder="Customer Address" />
           </>
-          
         )}
 
-<div className="space-y-2">
-              <Label>Invoice Type:</Label>
-              <RadioGroup
-                defaultValue="cash"
-                value={invoiceType}
-                onValueChange={setInvoiceType}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="cash" id="cash" />
-                  <Label htmlFor="cash">Cash</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="pending" id="pending" />
-                  <Label htmlFor="pending">Pending</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="transfer" id="transfer" />
-                  <Label htmlFor="transfer">Transfer</Label>
-                </div>
-              </RadioGroup>
+        <div className="space-y-2">
+          <Label>Invoice Type:</Label>
+          <RadioGroup
+            defaultValue="cash"
+            value={invoiceType}
+            onValueChange={setInvoiceType}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="cash" id="cash" />
+              <Label htmlFor="cash">Cash</Label>
             </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="pending" id="pending" />
+              <Label htmlFor="pending">Pending</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="transfer" id="transfer" />
+              <Label htmlFor="transfer">Transfer</Label>
+            </div>
+          </RadioGroup>
+        </div>
 
-            {/* Order Type */}
-            <div className="space-y-2">
-              <Label>Order Type:</Label>
-              <RadioGroup
-                defaultValue="delivery"
-                value={orderType}
-                onValueChange={setOrderType}
-                className="flex space-x-4"
-              >
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="delivery" id="delivery" />
-                  <Label htmlFor="delivery">Delivery</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="takeaway" id="takeaway" />
-                  <Label htmlFor="takeaway">Takeaway</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="dinein" id="dinein" />
-                  <Label htmlFor="dinein">DineIn</Label>
-                </div>
-              </RadioGroup>
+        {/* Order Type */}
+        <div className="space-y-2">
+          <Label>Order Type:</Label>
+          <RadioGroup
+            defaultValue="delivery"
+            value={orderType}
+            onValueChange={setOrderType}
+            className="flex space-x-4"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="delivery" id="delivery" />
+              <Label htmlFor="delivery">Delivery</Label>
             </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="takeaway" id="takeaway" />
+              <Label htmlFor="takeaway">Takeaway</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="dinein" id="dinein" />
+              <Label htmlFor="dinein">DineIn</Label>
+            </div>
+          </RadioGroup>
+        </div>
         {/* Items Table */}
         <div className="rounded-md border">
           <ScrollArea className="h-40">

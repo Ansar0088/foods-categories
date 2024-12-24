@@ -6,7 +6,8 @@ import { loginStart, loginSuccess, loginFailure } from "../../store/authSlice";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import axios, { AxiosError } from 'axios';
+import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import axios from "axios";
 
 const loginSchema = z.object({
   email: z
@@ -23,7 +24,10 @@ type FormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  const router = useRouter(); // Initialize useRouter
+  const { loading, error, isAuthenticated } = useSelector(
+    (state: RootState) => state.auth
+  );
 
   const {
     register,
@@ -39,21 +43,21 @@ export default function LoginForm() {
       const formData = new FormData();
       formData.append("email", data.email);
       formData.append("password", data.password);
-      const response = await axios.post("https://app.chickenfriedhub.com/api/login", formData);
 
-      dispatch(loginSuccess(response.data));
+      const response = await axios.post(
+        "https://app.chickenfriedhub.com/api/login",
+        formData
+      );
+
+      dispatch(loginSuccess(response.data)); 
       console.log("Login successful:", response.data);
+
+      router.push("/");
     } catch (err: unknown) {
-      if (err instanceof AxiosError) {
-        dispatch(loginFailure(err.response?.data?.message || "Login failed"));
-        console.error("Login failed:", err.response?.data?.message || err.message);
-      } else if (err instanceof Error) {
-        dispatch(loginFailure(err.message || "Login failed"));
-        console.error("Login failed:", err.message);
-      } else {
-        dispatch(loginFailure("An unexpected error occurred"));
-        console.error("Login failed: Unexpected error", err);
-      }
+      const errorMessage =
+        (err as any)?.response?.data?.message || "Login failed";
+      dispatch(loginFailure(errorMessage));
+      console.error("Login failed:", errorMessage);
     }
   };
 
