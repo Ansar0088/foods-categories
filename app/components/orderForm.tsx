@@ -26,8 +26,8 @@ import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useSelector } from "react-redux";
-import { RootState } from "../store/store";
 import { toggleWalking } from "../store/orderSlice";
+import { RootState } from "../store/store";
 
 export default function OrderForm() {
   const [invoiceType, setInvoiceType] = useState("cash");
@@ -35,7 +35,7 @@ export default function OrderForm() {
 
   const items = useAppSelector((state) => state.cart.items);
   const total = useAppSelector((state) => state.cart.total);
-  const isVisible = useSelector((state: any) => state.walking.visible);
+  const isVisible = useSelector((state: RootState) => state.walking.visible);
   console.log("sss--", isVisible);
 
   const dispatch = useAppDispatch();
@@ -46,7 +46,7 @@ export default function OrderForm() {
   const handleCheckboxChange = () => {
     dispatch(toggleWalking());
   };
-  const handleSubmit = (e: any) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const data = {
       invoiceType,

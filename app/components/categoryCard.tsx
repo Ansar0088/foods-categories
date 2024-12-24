@@ -1,8 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import { Category,SaleItem } from "../types";
+import { Category } from "../types";
 import { addToCart } from "../store/cartSlice";
 import { useAppDispatch } from "../hooks/store";
 

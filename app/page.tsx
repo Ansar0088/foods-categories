@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Categories from "./components/categories";
 import OrderForm from "./components/orderForm";
 import ProtectedRoute from "./login/components/ProtectedRoute";

@@ -1,13 +1,13 @@
 "use client";
 
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch } from "../../store/store";
+import { AppDispatch, RootState } from "../../store/store";
 import { loginStart, loginSuccess, loginFailure } from "../../store/authSlice";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { loginUser as apiLoginUser } from "@/lib/api";
-import axios from 'axios'
+import axios, { AxiosError } from 'axios';
+
 const loginSchema = z.object({
   email: z
     .string()
@@ -23,7 +23,7 @@ type FormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const dispatch = useDispatch<AppDispatch>();
-  const { loading, error } = useSelector((state: any) => state.auth);
+  const { loading, error } = useSelector((state: RootState) => state.auth);
 
   const {
     register,
@@ -36,19 +36,26 @@ export default function LoginForm() {
   const onSubmit = async (data: FormData) => {
     dispatch(loginStart());
     try {
-      const formData= new FormData()
-      formData.append("email",data.email)
-      formData.append("password",data.password)
-      const response = await axios.post("https://app.chickenfriedhub.com/api/login",formData)
-      dispatch(loginSuccess(response));
-      console.log("Login successful:", response);
-    } catch (err: any) {
-      dispatch(loginFailure(err.message || "Login failed"));
-      console.error("Login failed:", err.message);
+      const formData = new FormData();
+      formData.append("email", data.email);
+      formData.append("password", data.password);
+      const response = await axios.post("https://app.chickenfriedhub.com/api/login", formData);
+
+      dispatch(loginSuccess(response.data));
+      console.log("Login successful:", response.data);
+    } catch (err: unknown) {
+      if (err instanceof AxiosError) {
+        dispatch(loginFailure(err.response?.data?.message || "Login failed"));
+        console.error("Login failed:", err.response?.data?.message || err.message);
+      } else if (err instanceof Error) {
+        dispatch(loginFailure(err.message || "Login failed"));
+        console.error("Login failed:", err.message);
+      } else {
+        dispatch(loginFailure("An unexpected error occurred"));
+        console.error("Login failed: Unexpected error", err);
+      }
     }
   };
-  console.log('-----',JSON.stringify(apiLoginUser))
-
 
   return (
     <form

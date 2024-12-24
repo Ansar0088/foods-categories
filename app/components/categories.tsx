@@ -11,8 +11,14 @@ export default function Categories() {
   const { categories, isLoading, error } = useFetchCategories();
   const [searchTerm, setSearchTerm] = useState("");
 
+  interface Category {
+    sale_items: any;
+    id: string;
+    name: string;
+  }
+  
   const displayData = searchTerm
-    ? categories.filter((category: any) =>
+    ? categories.filter((category: Category) =>
         category.sale_items.some((item: any) =>
           item.name.toLowerCase().includes(searchTerm.toLowerCase())
         )
@@ -38,7 +44,7 @@ export default function Categories() {
         <div className="max-w-4xl w-full space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {displayData.length > 0 ? (
-              displayData.map((category: any, index: number) => (
+              displayData.map((category:Category, index: number) => (
                 <CategoryCard
                   key={index}
                   category={category}

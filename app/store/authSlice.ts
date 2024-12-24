@@ -1,5 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { loginUser as apiLoginUser } from "@/lib/api";
 
 interface User {
   id: string;
