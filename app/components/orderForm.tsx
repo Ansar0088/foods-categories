@@ -25,7 +25,6 @@ import { useAppDispatch, useAppSelector } from "../hooks/store";
 import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { data } from "./constant";
 import { useSelector } from "react-redux";
 import { RootState } from "../store/store";
 import { toggleWalking } from "../store/orderSlice";
@@ -100,8 +99,11 @@ export default function OrderForm() {
               <Input placeholder="Customer Name" />
             </div>
             <Input placeholder="Customer Address" />
+          </>
+          
+        )}
 
-            <div className="space-y-2">
+<div className="space-y-2">
               <Label>Invoice Type:</Label>
               <RadioGroup
                 defaultValue="cash"
@@ -147,10 +149,6 @@ export default function OrderForm() {
                 </div>
               </RadioGroup>
             </div>
-          </>
-          
-        )}
-
         {/* Items Table */}
         <div className="rounded-md border">
           <ScrollArea className="h-40">
