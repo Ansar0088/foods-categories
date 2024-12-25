@@ -4,11 +4,11 @@ import ProtectedRoute from "./login/components/ProtectedRoute";
 
 export default function Home() {
   return (
-    <ProtectedRoute>
+    // <ProtectedRoute>
     <div className="flex">
      <Categories/>
      <OrderForm/>
     </div>
-    </ProtectedRoute>
+    // </ProtectedRoute>
   );
 }
