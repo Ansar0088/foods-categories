@@ -138,7 +138,7 @@ export default function LoginPage() {
 
       {/* Right Panel - Image Section */}
       <div className="flex-1 hidden md:flex items-center justify-center relative">
-        <img src="/back.jpg" alt="Food Banner" className="w-full h-full " />
+        <img src="/back.jpg" alt="Food Banner" className="w-full h-full" />
         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center text-white px-4">
           <h2 className="text-3xl font-bold mb-2">Craving Something?</h2>
           <p className="mb-6">Let's get you started!</p>
