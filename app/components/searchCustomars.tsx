@@ -9,7 +9,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { fetchCustomers } from "@/lib/api"
@@ -17,7 +17,7 @@ import { useAtom } from "jotai"
 import { visibleWalkingAtom } from "../state/atom"
 
 interface SearchCustomersProps {
-  onSelectCustomer: (customer: { name: string; phone: string; address: string }) => void;
+  onSelectCustomer: (customer: { id:number; name: string; phone: string; address: string }) => void;
 }
 
 export default function SearchCustomers({ onSelectCustomer }: SearchCustomersProps) {
@@ -26,7 +26,7 @@ export default function SearchCustomers({ onSelectCustomer }: SearchCustomersPro
   const [customers, setCustomers] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(false)
   const [selectedCustomer, setSelectedCustomer] = React.useState<{ name: string; phone: string; address: string } | null>(null)
-  const [walking , setwalking] = useAtom(visibleWalkingAtom)
+  const [walking] = useAtom(visibleWalkingAtom)
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -93,6 +93,7 @@ export default function SearchCustomers({ onSelectCustomer }: SearchCustomersPro
                   variant="ghost"
                   role="option"
                   onClick={() => {setSelectedCustomer(null);onSelectCustomer({
+                    id:0,
                     name:"",
                     address:"",
                     phone:""

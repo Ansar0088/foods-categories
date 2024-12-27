@@ -100,7 +100,7 @@ export default function OrderForm() {
         
       };
       const response = await axios.post(
-        "https://app.chickenfriedhub.com/api/order",
+        "https://app.chickenfriedhub.com/api/order/create",
         data,{
           headers:{
             Authorization: "Bearer " + Cookies.get('token')
@@ -268,16 +268,4 @@ export default function OrderForm() {
       </form>
     </div>
   );
-}
-
-
-const data = {
-  walking: true,
-  moreFields: [
-    {
-      product_id: 1,
-      quantity: 2,
-      rate: 40
-    }
-  ]
 }

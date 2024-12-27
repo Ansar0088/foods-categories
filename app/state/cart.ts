@@ -3,7 +3,7 @@ import { SaleItem } from "../types";
 
 // Types
 interface CartItem extends SaleItem {
-  id:number
+  id?:number
   quantity: number;
   total: number;
 }
