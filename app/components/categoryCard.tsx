@@ -1,8 +1,10 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Category } from "../types";
-import { addToCart } from "../store/cartSlice";
-import { useAppDispatch } from "../hooks/store";
+import { useSetAtom } from "jotai";
+import { addToCartAtom } from "../state/cart";
+// import { addToCart } from "../store/cartSlice";
+// import { useAppDispatch } from "../hooks/store";
 
 interface CategoryCardProps {
   category: Category;
@@ -10,8 +12,8 @@ interface CategoryCardProps {
 }
 
 export function CategoryCard({ category, searchTerm }: CategoryCardProps) {
-  const dispatch = useAppDispatch();
-
+  // const dispatch = useAppDispatch();
+  const addToCart = useSetAtom(addToCartAtom);
   const highlightMatchingItem = (text: string) => {
     if (!searchTerm) return text;
     
@@ -38,16 +40,16 @@ export function CategoryCard({ category, searchTerm }: CategoryCardProps) {
       <CardContent className="p-4">
         <h3 className="text-xl font-semibold mb-4">{category.name}</h3>
         <ScrollArea className="h-[320px] w-full rounded-md">
-          <div className="space-y-3 pr-4">
+          <div className="space-y-1 pr-4">
             {filteredItems.map((item, index) => (
               <div
                 key={index}
-                onClick={() => dispatch(addToCart(item))}
-                className="flex cursor-pointer items-center justify-between p-3 py-1 hover:bg-gray-50 rounded-lg transition-colors"
+                onClick={() => addToCart(item)}
+                className="flex cursor-pointer  items-center justify-between hover:bg-gray-200 transition-colors"
               >
                 <div className="flex justify-between w-full">
-                  <p className="text-gray-800">{highlightMatchingItem(item.name)}</p>
-                  <p className="text-sm text-gray-500">{item.price.toFixed(2)}</p>
+                  <p className="text-gray-800 ">{highlightMatchingItem(item.name)}</p>
+                  <p className="text-sm text-gray-700">{item.price.toFixed(2)}</p>
                 </div>
               </div>
             ))}

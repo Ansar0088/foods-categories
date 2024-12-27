@@ -15,34 +15,47 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAppDispatch, useAppSelector } from "../hooks/store";
-import { removeFromCart, updateQuantity } from "../store/cartSlice";
+// import { useAppDispatch, useAppSelector } from "../hooks/store";
+// import { removeFromCart, updateQuantity } from "../store/cartSlice";
 import { Minus, Plus, Trash2 } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { useSelector } from "react-redux";
-import { toggleWalking } from "../store/orderSlice";
-import { RootState } from "../store/store";
+// import { useSelector } from "react-redux";
+// import { toggleWalking } from "../store/orderSlice";
+// import { RootState } from "../store/store";
 import SearchCustomars from "./searchCustomars";
+import { useAtom, useAtomValue } from "jotai";
+import { cartItemsAtom, cartTotalAtom, clearCartAtom, removeFromCartAtom, updateQuantityAtom } from "../state/cart";
+import { visibleWalkingAtom } from "../state/atom";
+import axios from "axios";
+import Cookies from "js-cookie";
 
 export default function OrderForm() {
   const [invoiceType, setInvoiceType] = useState("cash");
   const [orderType, setOrderType] = useState("delivery");
+
+  const [customerid, setCustomerId] = useState(0);
   const [customerName, setCustomerName] = useState("");
   const [customerNumber, setCustomerNumber] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [loading, setLoading] = useState(false);
-  const [walking,setWalking]=useState('')
-
-  const dispatch = useAppDispatch();
-  const items = useAppSelector((state) => state.cart.items);
-  const total = useAppSelector((state) => state.cart.total);
-  const isVisible = useSelector((state: RootState) => state.walking.visible);
+  const [, updateQuantity] = useAtom(updateQuantityAtom);
+  const [, clearCart] = useAtom(clearCartAtom);
+  const items = useAtomValue(cartItemsAtom);
+  const total = useAtomValue(cartTotalAtom);
+  const [walking , setwalking] = useAtom(visibleWalkingAtom)
+  const [, removeFromCart] = useAtom(removeFromCartAtom);
+  // const dispatch = useAppDispatch();
+  // const items = useAppSelector((state) => state.cart.items);
+  // const total = useAppSelector((state) => state.cart.total);
+  // const isVisible = useSelector((state: RootState) => state.walking.visible);
 
   const handleCustomerSelect = (customer: {
+    id: number;
     name: string;
     phone: string;
     address: string;
   }) => {
+    setCustomerId(customer.id)
     setCustomerName(customer.name);
     setCustomerNumber(customer.phone);
     setCustomerAddress(customer.address);
@@ -50,19 +63,23 @@ export default function OrderForm() {
 
   const handleQuantityChange = (name: string, quantity: number) => {
     if (quantity >= 0) {
-      dispatch(updateQuantity({ name, quantity }));
+      updateQuantity({ name, quantity })
     }
   };
 
   const handleCheckboxChange = () => {
-    dispatch(toggleWalking());
-    setWalking('true')
+    // dispatch(toggleWalking());
+    setwalking(!walking)
   };
 
   const resetForm = () => {
+    setCustomerId(0);
     setCustomerName("");
     setCustomerNumber("");
     setCustomerAddress("");
+     setInvoiceType("cash");
+    setOrderType("delivery");
+    clearCart()
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -71,21 +88,26 @@ export default function OrderForm() {
 
     try {
       const data: any = {
-        invoiceType,
-        orderType,
-        items,
-        total,
-        walkinCustomer: walking ,
-        customerDetails: isVisible
-          ? {
-              name: customerName,
-              phone: customerNumber,
-              address: customerAddress,
-            }
-          : null,
+        walking: walking,
+        customer_id:customerid,
+        customer_number:customerNumber,
+        customer_name:customerName,
+        customer_address:customerAddress,
+        payment_type:invoiceType,
+        order_type:orderType,
+        moreFields:items.map((v) => ({product_id:v.id,quantity:v.quantity,rate:v.price})),
+        payment:total,
+        
       };
-
-      console.log("Submitting Order Data:", data);
+      const response = await axios.post(
+        "https://app.chickenfriedhub.com/api/order",
+        data,{
+          headers:{
+            Authorization: "Bearer " + Cookies.get('token')
+          }
+        }
+      );
+      console.log("order-submit", response);
       resetForm();
       toast.success("Order submitted successfully!");
     } catch (error) {
@@ -104,14 +126,14 @@ export default function OrderForm() {
             <Checkbox
               id="toggleVisibility"
               onCheckedChange={handleCheckboxChange}
-              checked={!isVisible}
+              checked={walking}
             />
             <Label htmlFor="toggleVisibility">Walking</Label>
           </div>
           <SearchCustomars onSelectCustomer={handleCustomerSelect} />
         </div>
 
-        {isVisible && (
+        {!walking && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               placeholder="Customer Name"
@@ -173,10 +195,10 @@ export default function OrderForm() {
 
         {/* Items Table */}
         <div className="rounded-md border">
-          <ScrollArea className="h-40">
+          <ScrollArea className=" h-[calc(100vh-_350px)] overflow-y-auto">
             <Table>
               <TableHeader>
-                <TableRow>
+                <TableRow className="">
                   <TableHead>Item</TableHead>
                   <TableHead>Price</TableHead>
                   <TableHead>Quantity</TableHead>
@@ -188,12 +210,12 @@ export default function OrderForm() {
                 {items.map((item:any) => (
                   <TableRow key={item.name}>
                     <TableCell>{item.name}</TableCell>
-                    <TableCell>${item.price.toFixed(2)}</TableCell>
+                    <TableCell>{item.price.toFixed(2)}</TableCell>
                     <TableCell>
                       <div className="flex items-center">
                         <Button
-                          variant="outline"
                           size="sm"
+                          type="button"
                           onClick={() =>
                             handleQuantityChange(item.name, item.quantity - 1)
                           }
@@ -202,8 +224,9 @@ export default function OrderForm() {
                         </Button>
                         <span className="mx-2">{item.quantity}</span>
                         <Button
-                          variant="outline"
+
                           size="sm"
+                          type="button"
                           onClick={() =>
                             handleQuantityChange(item.name, item.quantity + 1)
                           }
@@ -212,25 +235,18 @@ export default function OrderForm() {
                         </Button>
                       </div>
                     </TableCell>
-                    <TableCell>${item.total.toFixed(2)}</TableCell>
+                    <TableCell>{item.total.toFixed(2)}</TableCell>
                     <TableCell>
                       <Button
                         variant="ghost"
-                        onClick={() => dispatch(removeFromCart(item.name))}
+                        onClick={() => removeFromCart(item.name)}
                       >
                         <Trash2 className="text-red-600" />
                       </Button>
                     </TableCell>
                   </TableRow>
                 ))}
-                <TableRow>
-                  <TableCell colSpan={3} className="text-right font-medium">
-                    Total Amount:
-                  </TableCell>
-                  <TableCell className="font-bold">
-                    ${total.toFixed(2)}
-                  </TableCell>
-                </TableRow>
+               
               </TableBody>
             </Table>
           </ScrollArea>
@@ -241,11 +257,27 @@ export default function OrderForm() {
           <Button variant="outline" type="button" onClick={resetForm}>
             Reset
           </Button>
+          <div className="flex justify-center items-center">
+            <p className="mx-4 text-xl font-bold">Total: Rs-/ {total.toFixed(2)}</p>
+          
           <Button type="submit" disabled={loading}>
             {loading ? "Submitting..." : "Submit"}
           </Button>
+          </div>
         </div>
       </form>
     </div>
   );
+}
+
+
+const data = {
+  walking: true,
+  moreFields: [
+    {
+      product_id: 1,
+      quantity: 2,
+      rate: 40
+    }
+  ]
 }

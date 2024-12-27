@@ -13,6 +13,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Input } from "@/components/ui/input"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { fetchCustomers } from "@/lib/api"
+import { useAtom } from "jotai"
+import { visibleWalkingAtom } from "../state/atom"
 
 interface SearchCustomersProps {
   onSelectCustomer: (customer: { name: string; phone: string; address: string }) => void;
@@ -24,6 +26,7 @@ export default function SearchCustomers({ onSelectCustomer }: SearchCustomersPro
   const [customers, setCustomers] = React.useState<any[]>([])
   const [loading, setLoading] = React.useState(false)
   const [selectedCustomer, setSelectedCustomer] = React.useState<{ name: string; phone: string; address: string } | null>(null)
+  const [walking , setwalking] = useAtom(visibleWalkingAtom)
 
   React.useEffect(() => {
     const timer = setTimeout(() => {
@@ -52,11 +55,12 @@ export default function SearchCustomers({ onSelectCustomer }: SearchCustomersPro
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
+    <Popover  open={open} onOpenChange={setOpen}>
+      <PopoverTrigger disabled={walking} asChild>
         <Button
           variant="outline"
           role="combobox"
+          disabled={walking}
           aria-expanded={open}
           className="w-96 justify-between"
         >
@@ -84,8 +88,28 @@ export default function SearchCustomers({ onSelectCustomer }: SearchCustomersPro
               <p className="text-sm text-muted-foreground">No customers found</p>
             </div>
           ) : (
-            <div className="space-y-1 p-1">
-              {customers.map((customer) => (
+            <div className="space-y-1 p-1 w-full">
+                <Button
+                  variant="ghost"
+                  role="option"
+                  onClick={() => {setSelectedCustomer(null);onSelectCustomer({
+                    name:"",
+                    address:"",
+                    phone:""
+                  });
+                  setOpen(false)}}
+                  
+                >
+                 
+                  <div className="flex flex-col items-start">
+                    <span className="text-sm font-medium">Cancel</span>
+                  
+                  </div>
+                 
+                </Button>
+              {customers.map((customer) => {
+               
+                return (
                 <Button
                   key={customer.id}
                   variant="ghost"
@@ -111,7 +135,7 @@ export default function SearchCustomers({ onSelectCustomer }: SearchCustomersPro
                     <Check className="ml-auto h-4 w-4" />
                   )}
                 </Button>
-              ))}
+              )})}
             </div>
           )}
         </ScrollArea>

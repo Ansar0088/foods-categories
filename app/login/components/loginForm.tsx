@@ -1,14 +1,16 @@
 "use client";
 
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store/store";
-import { loginStart, loginSuccess, loginFailure } from "../../store/authSlice";
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-
+import { useSetAtom } from "jotai";
+import { authUser } from "@/app/state/atom";
+import { toast } from "sonner";
+import { useState } from "react";
+import Cookies from "js-cookie";
 const loginSchema = z.object({
   email: z
     .string()
@@ -23,9 +25,10 @@ const loginSchema = z.object({
 type FormData = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
-  const dispatch = useDispatch<AppDispatch>();
+  const setAuthUser = useSetAtom(authUser)
+  const [loading,setLoading] = useState(false)
   const router = useRouter();
-  const { loading, error } = useSelector((state: RootState) => state.auth);
+  // const { loading, error } = useSelector((state: RootState) => state.auth);
 
   const {
     register,
@@ -36,19 +39,23 @@ export default function LoginPage() {
   });
 
   const onSubmit = async (data: FormData) => {
-    dispatch(loginStart());
+    setLoading(true)
     try {
       const response = await axios.post(
         "https://app.chickenfriedhub.com/api/login",
         data
       );
-      console.log("agya----", data);
-      dispatch(loginSuccess(response.data));
+      setLoading(false)
+      Cookies.set('token',response.data.data.token)
+      Cookies.set('username',response.data.data.user.name)
+      setAuthUser(response.data.data.user)
       router.push("/");
-    } catch (err: unknown) {
-      const errorMessage =
-        (err as any)?.response?.data?.message || "Login failed";
-      dispatch(loginFailure(errorMessage));
+    } catch (err: any) {
+      toast.error('Login Failed!')
+      console.log(err)
+    //   const errorMessage =
+    //     (err as any)?.response?.data?.message || "Login failed";
+    //   // dispatch(loginFailure(errorMessage));
     }
   };
 
@@ -59,11 +66,11 @@ export default function LoginPage() {
         <div className="w-full max-w-md">
           <h2 className="text-2xl font-semibold mb-4">Log in</h2>
           <p className="text-gray-500 mb-8">Please enter your details below.</p>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-center">
+          {/* {error && ( */}
+            {/* <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 text-center">
               {error}
             </div>
-          )}
+          )} */}
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <div>
               <label
@@ -141,7 +148,7 @@ export default function LoginPage() {
         <img src="/back.jpg" alt="Food Banner" className="w-full h-full" />
         <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-center text-white px-4">
           <h2 className="text-3xl font-bold mb-2">Craving Something?</h2>
-          <p className="mb-6">Let's get you started!</p>
+          <p className="mb-6">Let&apos;s get you started!</p>
           {/* <button className="bg-orange-500 text-white py-2 px-6 rounded-lg hover:bg-orange-600">
             Get Started
           </button> */}
