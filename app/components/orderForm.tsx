@@ -28,10 +28,13 @@ import { cartItemsAtom, cartTotalAtom, clearCartAtom, removeFromCartAtom, update
 import { visibleWalkingAtom } from "../state/atom";
 import axios from "axios";
 import Cookies from "js-cookie";
+import Receipt from "./Receipt";
 
 export default function OrderForm() {
   const [invoiceType, setInvoiceType] = useState("cash");
   const [orderType, setOrderType] = useState("delivery");
+  
+  const [orderData, setOrderData] = useState<any | null>(null);
 
   const [customerid, setCustomerId] = useState(0);
   const [customerName, setCustomerName] = useState("");
@@ -82,6 +85,42 @@ export default function OrderForm() {
     clearCart()
   };
 
+  const handlePrint = () => {
+    const printContent = document.getElementById("printable-receipt")!;
+    const printWindow = window.open("", "_blank");
+    if (printWindow) {
+      printWindow.document.open();
+      printWindow.document.write(`
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+          <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+          <style>
+              body{
+                  width: 100%;
+                  margin-left: auto;
+                  margin-right: auto;
+              }
+              .fontsm {
+                  font-size: 10px;
+              }
+              .add{
+                  font-size: 12px;
+              }
+          </style>
+      </head>
+          <body>${printContent.innerHTML}</body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.print();
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
@@ -107,9 +146,14 @@ export default function OrderForm() {
           }
         }
       );
+      toast.success("Order submitted successfully!");
+      setOrderData(data);
       console.log("order-submit", response);
       resetForm();
-      toast.success("Order submitted successfully!");
+      setTimeout(() => {
+        handlePrint(); // Trigger the print dialog
+      }, 500);
+
     } catch (error) {
       console.error("Error submitting order:", error);
       toast.error("Failed to submit order.");
@@ -263,6 +307,8 @@ export default function OrderForm() {
           <Button type="submit" disabled={loading}>
             {loading ? "Submitting..." : "Submit"}
           </Button>
+
+          {orderData && <Receipt order={orderData} />}
           </div>
         </div>
       </form>
