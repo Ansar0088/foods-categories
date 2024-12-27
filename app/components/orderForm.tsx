@@ -155,7 +155,7 @@ export default function OrderForm() {
         )}
 
         {/* Invoice and Order Type */}
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-1">
           <RadioGroup
             defaultValue="cash"
             value={invoiceType}

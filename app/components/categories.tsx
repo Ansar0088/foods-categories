@@ -40,7 +40,7 @@ export default function Categories() {
           </p>
         </div>
       )}
-      <ScrollArea className="h-[550px] w-full rounded-md mt-5 p-5">
+      <ScrollArea className="w-full rounded-md mt-5 p-5">
         <div className="max-w-4xl w-full space-y-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {displayData.length > 0 ? (
