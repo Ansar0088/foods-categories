@@ -39,7 +39,7 @@ export function CategoryCard({ category, searchTerm }: CategoryCardProps) {
     <Card className="h-[400px]">
       <CardContent className="p-4">
         <h3 className="text-xl font-semibold mb-4">{category.name}</h3>
-        <ScrollArea className="h-[320px] w-full rounded-md">
+        <ScrollArea className="h-[320px] overflow-auto w-full rounded-md">
           <div className="space-y-1 pr-4">
             {filteredItems.map((item, index) => (
               <div
